@@ -1,0 +1,318 @@
+﻿#pragma warning disable 10001
+
+namespace ChaturRedux
+{
+  public partial class MainForm
+  {
+    /// <summary>
+    /// Required designer variable.
+    /// </summary>
+    private  mutable  components : System.ComponentModel.IContainer = null;
+
+    /// <summary>
+    /// Clean up any resources being used.
+    /// </summary>
+    /// <param name="disposing">
+    /// true if managed resources should be disposed; otherwise, false.
+    /// </param>
+    protected override Dispose(disposing : bool) :  void
+    {
+      when (disposing && components != null)
+        components.Dispose();
+
+      base.Dispose(disposing);
+    }
+
+    /// <summary>
+    /// Required method for Designer support - do not modify
+    /// the contents of this method with the code editor.
+    /// </summary>
+    private InitializeComponent() :  void
+    {
+        this.pnlSplit = System.Windows.Forms.SplitContainer();
+        this.txInput = System.Windows.Forms.TextBox();
+        this.pnlTabs = System.Windows.Forms.TabControl();
+        this.tabConn = System.Windows.Forms.TabPage();
+        this.pnlSplitConn = System.Windows.Forms.SplitContainer();
+        this.gb1 = System.Windows.Forms.GroupBox();
+        this.lbUsers = System.Windows.Forms.ListBox();
+        this.lbStatus = System.Windows.Forms.Label();
+        this.gb3 = System.Windows.Forms.GroupBox();
+        this.txNick = System.Windows.Forms.TextBox();
+        this.label1 = System.Windows.Forms.Label();
+        this.gb2 = System.Windows.Forms.GroupBox();
+        this.btConn = System.Windows.Forms.Button();
+        this.txSvPrt = System.Windows.Forms.TextBox();
+        this.txSvAdr = System.Windows.Forms.TextBox();
+        this.lb2 = System.Windows.Forms.Label();
+        this.lb1 = System.Windows.Forms.Label();
+        this.tabChat = System.Windows.Forms.TabPage();
+        (this.pnlSplit :> System.ComponentModel.ISupportInitialize).BeginInit();
+        this.pnlSplit.Panel2.SuspendLayout();
+        this.pnlSplit.SuspendLayout();
+        this.pnlTabs.SuspendLayout();
+        this.tabConn.SuspendLayout();
+        (this.pnlSplitConn :> System.ComponentModel.ISupportInitialize).BeginInit();
+        this.pnlSplitConn.Panel1.SuspendLayout();
+        this.pnlSplitConn.Panel2.SuspendLayout();
+        this.pnlSplitConn.SuspendLayout();
+        this.gb1.SuspendLayout();
+        this.gb3.SuspendLayout();
+        this.gb2.SuspendLayout();
+        this.tabChat.SuspendLayout();
+        this.SuspendLayout();
+        // 
+        // pnlSplit
+        // 
+        this.pnlSplit.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+        this.pnlSplit.Dock = System.Windows.Forms.DockStyle.Fill;
+        this.pnlSplit.FixedPanel = System.Windows.Forms.FixedPanel.Panel2;
+        this.pnlSplit.Location = System.Drawing.Point(3,  3);
+        this.pnlSplit.Name = "pnlSplit";
+        this.pnlSplit.Orientation = System.Windows.Forms.Orientation.Horizontal;
+        // 
+        // pnlSplit.Panel2
+        // 
+        this.pnlSplit.Panel2.Controls.Add(this.txInput);
+        this.pnlSplit.Panel2MinSize = 90;
+        this.pnlSplit.Size = System.Drawing.Size(770,  406);
+        this.pnlSplit.SplitterDistance = 310;
+        this.pnlSplit.TabIndex = 0;
+        // 
+        // txInput
+        // 
+        this.txInput.Dock = System.Windows.Forms.DockStyle.Fill;
+        this.txInput.Enabled = false;
+        this.txInput.Font = System.Drawing.Font("Verdana",  9.75f,  System.Drawing.FontStyle.Regular,  System.Drawing.GraphicsUnit.Point,  (204 :> byte));
+        this.txInput.Location = System.Drawing.Point(0,  0);
+        this.txInput.Multiline = true;
+        this.txInput.Name = "txInput";
+        this.txInput.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+        this.txInput.Size = System.Drawing.Size(768,  90);
+        this.txInput.TabIndex = 0;
+        this.txInput.KeyDown += System.Windows.Forms.KeyEventHandler(this.txInput_KeyDown);
+        // 
+        // pnlTabs
+        // 
+        this.pnlTabs.Controls.Add(this.tabConn);
+        this.pnlTabs.Controls.Add(this.tabChat);
+        this.pnlTabs.Dock = System.Windows.Forms.DockStyle.Fill;
+        this.pnlTabs.Font = System.Drawing.Font("Microsoft Sans Serif",  9.75f,  System.Drawing.FontStyle.Regular,  System.Drawing.GraphicsUnit.Point,  (204 :> byte));
+        this.pnlTabs.Location = System.Drawing.Point(0,  0);
+        this.pnlTabs.Name = "pnlTabs";
+        this.pnlTabs.SelectedIndex = 0;
+        this.pnlTabs.Size = System.Drawing.Size(784,  441);
+        this.pnlTabs.TabIndex = 6;
+        // 
+        // tabConn
+        // 
+        this.tabConn.Controls.Add(this.pnlSplitConn);
+        this.tabConn.Location = System.Drawing.Point(4,  25);
+        this.tabConn.Name = "tabConn";
+        this.tabConn.Padding = System.Windows.Forms.Padding(3);
+        this.tabConn.Size = System.Drawing.Size(776,  412);
+        this.tabConn.TabIndex = 1;
+        this.tabConn.Text = "Connection";
+        this.tabConn.UseVisualStyleBackColor = true;
+        // 
+        // pnlSplitConn
+        // 
+        this.pnlSplitConn.Dock = System.Windows.Forms.DockStyle.Fill;
+        this.pnlSplitConn.Location = System.Drawing.Point(3,  3);
+        this.pnlSplitConn.Margin = System.Windows.Forms.Padding(0);
+        this.pnlSplitConn.Name = "pnlSplitConn";
+        // 
+        // pnlSplitConn.Panel1
+        // 
+        this.pnlSplitConn.Panel1.Controls.Add(this.gb1);
+        this.pnlSplitConn.Panel1MinSize = 296;
+        // 
+        // pnlSplitConn.Panel2
+        // 
+        this.pnlSplitConn.Panel2.Controls.Add(this.lbStatus);
+        this.pnlSplitConn.Panel2.Controls.Add(this.gb3);
+        this.pnlSplitConn.Panel2.Controls.Add(this.gb2);
+        this.pnlSplitConn.Panel2MinSize = 470;
+        this.pnlSplitConn.Size = System.Drawing.Size(770,  406);
+        this.pnlSplitConn.SplitterDistance = 296;
+        this.pnlSplitConn.TabIndex = 1;
+        // 
+        // gb1
+        // 
+        this.gb1.Controls.Add(this.lbUsers);
+        this.gb1.Dock = System.Windows.Forms.DockStyle.Fill;
+        this.gb1.Font = System.Drawing.Font("Microsoft Sans Serif",  9.75f,  System.Drawing.FontStyle.Regular,  System.Drawing.GraphicsUnit.Point,  (204 :> byte));
+        this.gb1.Location = System.Drawing.Point(0,  0);
+        this.gb1.Name = "gb1";
+        this.gb1.Size = System.Drawing.Size(296,  406);
+        this.gb1.TabIndex = 0;
+        this.gb1.TabStop = false;
+        this.gb1.Text = "Connected users";
+        // 
+        // lbUsers
+        // 
+        this.lbUsers.Dock = System.Windows.Forms.DockStyle.Fill;
+        this.lbUsers.Font = System.Drawing.Font("Microsoft Sans Serif",  12f,  System.Drawing.FontStyle.Regular,  System.Drawing.GraphicsUnit.Point,  (204 :> byte));
+        this.lbUsers.FormattingEnabled = true;
+        this.lbUsers.ItemHeight = 20;
+        this.lbUsers.Location = System.Drawing.Point(3,  18);
+        this.lbUsers.Name = "lbUsers";
+        this.lbUsers.Size = System.Drawing.Size(290,  385);
+        this.lbUsers.TabIndex = 5;
+        // 
+        // lbStatus
+        // 
+        this.lbStatus.Dock = System.Windows.Forms.DockStyle.Bottom;
+        this.lbStatus.Font = System.Drawing.Font("Verdana",  12f,  System.Drawing.FontStyle.Regular,  System.Drawing.GraphicsUnit.Point,  (204 :> byte));
+        this.lbStatus.ForeColor = System.Drawing.Color.Black;
+        this.lbStatus.Location = System.Drawing.Point(0,  383);
+        this.lbStatus.Name = "lbStatus";
+        this.lbStatus.Size = System.Drawing.Size(470,  23);
+        this.lbStatus.TabIndex = 2;
+        this.lbStatus.Text = "STATUS:";
+        // 
+        // gb3
+        // 
+        this.gb3.Controls.Add(this.txNick);
+        this.gb3.Controls.Add(this.label1);
+        this.gb3.Dock = System.Windows.Forms.DockStyle.Top;
+        this.gb3.Location = System.Drawing.Point(0,  96);
+        this.gb3.Name = "gb3";
+        this.gb3.Size = System.Drawing.Size(470,  58);
+        this.gb3.TabIndex = 1;
+        this.gb3.TabStop = false;
+        this.gb3.Text = "User settings";
+        // 
+        // txNick
+        // 
+        this.txNick.Anchor = (((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+                    | System.Windows.Forms.AnchorStyles.Right) :> System.Windows.Forms.AnchorStyles);
+        this.txNick.Font = System.Drawing.Font("Microsoft Sans Serif",  12f,  System.Drawing.FontStyle.Regular,  System.Drawing.GraphicsUnit.Point,  (204 :> byte));
+        this.txNick.Location = System.Drawing.Point(95,  21);
+        this.txNick.MaxLength = 40;
+        this.txNick.Name = "txNick";
+        this.txNick.Size = System.Drawing.Size(369,  26);
+        this.txNick.TabIndex = 4;
+        this.txNick.Text = "Guest";
+        // 
+        // label1
+        // 
+        this.label1.AutoSize = true;
+        this.label1.Font = System.Drawing.Font("Microsoft Sans Serif",  12f,  System.Drawing.FontStyle.Regular,  System.Drawing.GraphicsUnit.Point,  (204 :> byte));
+        this.label1.Location = System.Drawing.Point(6,  24);
+        this.label1.Name = "label1";
+        this.label1.Size = System.Drawing.Size(83,  20);
+        this.label1.TabIndex = 2;
+        this.label1.Text = "Nickname:";
+        // 
+        // gb2
+        // 
+        this.gb2.Controls.Add(this.btConn);
+        this.gb2.Controls.Add(this.txSvPrt);
+        this.gb2.Controls.Add(this.txSvAdr);
+        this.gb2.Controls.Add(this.lb2);
+        this.gb2.Controls.Add(this.lb1);
+        this.gb2.Dock = System.Windows.Forms.DockStyle.Top;
+        this.gb2.Location = System.Drawing.Point(0,  0);
+        this.gb2.Name = "gb2";
+        this.gb2.Size = System.Drawing.Size(470,  96);
+        this.gb2.TabIndex = 0;
+        this.gb2.TabStop = false;
+        this.gb2.Text = "Connect to...";
+        // 
+        // btConn
+        // 
+        this.btConn.Anchor = (((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+                    | System.Windows.Forms.AnchorStyles.Right) :> System.Windows.Forms.AnchorStyles);
+        this.btConn.Font = System.Drawing.Font("Microsoft Sans Serif",  12f,  System.Drawing.FontStyle.Regular,  System.Drawing.GraphicsUnit.Point,  (204 :> byte));
+        this.btConn.Location = System.Drawing.Point(200,  58);
+        this.btConn.Name = "btConn";
+        this.btConn.Size = System.Drawing.Size(264,  26);
+        this.btConn.TabIndex = 3;
+        this.btConn.Text = "Connect to server";
+        this.btConn.UseVisualStyleBackColor = true;
+        this.btConn.Click += System.EventHandler(this.btConn_Click);
+        // 
+        // txSvPrt
+        // 
+        this.txSvPrt.Font = System.Drawing.Font("Microsoft Sans Serif",  12f,  System.Drawing.FontStyle.Regular,  System.Drawing.GraphicsUnit.Point,  (204 :> byte));
+        this.txSvPrt.Location = System.Drawing.Point(132,  58);
+        this.txSvPrt.MaxLength = 5;
+        this.txSvPrt.Name = "txSvPrt";
+        this.txSvPrt.Size = System.Drawing.Size(62,  26);
+        this.txSvPrt.TabIndex = 2;
+        this.txSvPrt.Text = "42480";
+        // 
+        // txSvAdr
+        // 
+        this.txSvAdr.Anchor = (((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+                    | System.Windows.Forms.AnchorStyles.Right) :> System.Windows.Forms.AnchorStyles);
+        this.txSvAdr.Font = System.Drawing.Font("Microsoft Sans Serif",  12f,  System.Drawing.FontStyle.Regular,  System.Drawing.GraphicsUnit.Point,  (204 :> byte));
+        this.txSvAdr.Location = System.Drawing.Point(132,  26);
+        this.txSvAdr.Name = "txSvAdr";
+        this.txSvAdr.Size = System.Drawing.Size(332,  26);
+        this.txSvAdr.TabIndex = 1;
+        this.txSvAdr.Text = "127.0.0.1";
+        // 
+        // lb2
+        // 
+        this.lb2.AutoSize = true;
+        this.lb2.Font = System.Drawing.Font("Microsoft Sans Serif",  12f,  System.Drawing.FontStyle.Regular,  System.Drawing.GraphicsUnit.Point,  (204 :> byte));
+        this.lb2.Location = System.Drawing.Point(35,  61);
+        this.lb2.Name = "lb2";
+        this.lb2.Size = System.Drawing.Size(91,  20);
+        this.lb2.TabIndex = 0;
+        this.lb2.Text = "Server port:";
+        // 
+        // lb1
+        // 
+        this.lb1.AutoSize = true;
+        this.lb1.Font = System.Drawing.Font("Microsoft Sans Serif",  12f,  System.Drawing.FontStyle.Regular,  System.Drawing.GraphicsUnit.Point,  (204 :> byte));
+        this.lb1.Location = System.Drawing.Point(6,  29);
+        this.lb1.Name = "lb1";
+        this.lb1.Size = System.Drawing.Size(120,  20);
+        this.lb1.TabIndex = 0;
+        this.lb1.Text = "Server address:";
+        // 
+        // tabChat
+        // 
+        this.tabChat.Controls.Add(this.pnlSplit);
+        this.tabChat.Location = System.Drawing.Point(4,  25);
+        this.tabChat.Name = "tabChat";
+        this.tabChat.Padding = System.Windows.Forms.Padding(3);
+        this.tabChat.Size = System.Drawing.Size(776,  412);
+        this.tabChat.TabIndex = 0;
+        this.tabChat.Text = "CHATURR";
+        this.tabChat.UseVisualStyleBackColor = true;
+        // 
+        // MainForm
+        // 
+        this.AutoScaleDimensions = System.Drawing.SizeF(6f,  13f);
+        this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+        this.ClientSize = System.Drawing.Size(784,  441);
+        this.Controls.Add(this.pnlTabs);
+        this.MinimumSize = System.Drawing.Size(800,  480);
+        this.Name = "MainForm";
+        this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+        this.Text = "Chaturr Redux";
+        this.FormClosed += System.Windows.Forms.FormClosedEventHandler(this.MainForm_FormClosed);
+        this.pnlSplit.Panel2.ResumeLayout(false);
+        this.pnlSplit.Panel2.PerformLayout();
+        (this.pnlSplit :> System.ComponentModel.ISupportInitialize).EndInit();
+        this.pnlSplit.ResumeLayout(false);
+        this.pnlTabs.ResumeLayout(false);
+        this.tabConn.ResumeLayout(false);
+        this.pnlSplitConn.Panel1.ResumeLayout(false);
+        this.pnlSplitConn.Panel2.ResumeLayout(false);
+        (this.pnlSplitConn :> System.ComponentModel.ISupportInitialize).EndInit();
+        this.pnlSplitConn.ResumeLayout(false);
+        this.gb1.ResumeLayout(false);
+        this.gb3.ResumeLayout(false);
+        this.gb3.PerformLayout();
+        this.gb2.ResumeLayout(false);
+        this.gb2.PerformLayout();
+        this.tabChat.ResumeLayout(false);
+        this.ResumeLayout(false);
+    }
+  }
+}

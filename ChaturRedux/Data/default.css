@@ -1,0 +1,26 @@
+body {
+	font-family: Verdana, sans-serif;
+}
+.notify {
+	color: #40B2B2;
+	font-weight: bold;
+}
+
+.msg {
+	color: inherit;
+}
+
+.self {
+	color: #9932CC;
+	font-weight: bold;
+}
+
+.other {
+	color: #009200;
+	font-weight: bold;
+}
+
+.thumb {
+	max-width: 120px;
+	max-height: 120px;
+}

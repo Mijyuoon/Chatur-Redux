@@ -1,0 +1,151 @@
+﻿using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+using Nemerle.Imperative;
+
+using System;
+using SCG = System.Collections.Generic;
+using System.Console;
+using System.Linq;
+using System.Text;
+using System.Web;
+
+using MijMacro;
+
+namespace Mijyuoon {
+    public class MijMarkup {
+        private _Tags : SCG.Dictionary[string, Tag];
+        private StkTag : SCG.Stack[string];
+        private Buffer : StringBuilder;
+        private TagArgs : SCG.List[string];
+    
+        public this() {
+            this._Tags = SCG.Dictionary();
+            this.StkTag = SCG.Stack();
+            this.Buffer = StringBuilder();
+            this.TagArgs = SCG.List();
+        }
+    
+        public Tags : SCG.Dictionary[string, Tag] {
+            get { _Tags; }
+        }
+    
+        public Parse(src : string) : string {
+            StkTag.Clear();
+            TagArgs.Clear();
+            ignore Buffer.Clear();
+            mutable (_mode, _pos) = (0, 0);
+            mutable _ctag : string;
+        
+            while(_pos < src.Length) {
+                match(_mode) {
+                    | 0 =>
+                        if(src[_pos] != '{') {
+                            ignore Buffer.Append(src[_pos]); _pos++;
+                        } else {
+                            _pos++;
+                            match(src[_pos]) {
+                                | '{' =>
+                                    ignore Buffer.Append('{');
+                                | '\\' => _mode = 1;
+                                | ki =>
+                                    ignore Buffer.Append('{').Append(ki);
+                            }
+                            _pos++;
+                        }
+                    | 1 =>
+                        mutable npos = 0;
+                        while(Char.IsLetter(src[_pos])) {
+                            npos++; _pos++;
+                        }
+                        if(npos < 1)
+                            if(src[_pos] == '}') {
+                                PopTag(); _pos++; _mode = 0;
+                            } else return null;
+                        else {
+                            _ctag = src.Substring(_pos - npos, npos);
+                            match(src[_pos]) {
+                                | '=' => _mode = 2;
+                                | '}' =>
+                                    _mode = 0;
+                                    PushDoTag(_ctag);
+                                | _ => return null;
+                            }
+                            _pos++;
+                        }
+                    | 2 =>
+                        mutable npos = 0;
+                        while(Char.IsLetterOrDigit(src[_pos])
+                        || src[_pos] == '#') {
+                            npos++; _pos++;
+                        }
+                        when(npos < 1) return null;
+                        TagArgs.Add(src.Substring(_pos - npos, npos));
+                        WriteLine($"d=$(src[_pos])");
+                        match(src[_pos]) {
+                            | ';' => ();
+                            | '}' =>
+                                _mode = 0;
+                                PushDoTag(_ctag);
+                            | _ => return null;
+                        }
+                        _pos++;
+                    | _ => die "Wtf mode?!";
+                }
+            }
+            while(StkTag.Count > 0) PopTag();
+            Buffer.ToString();
+        }
+    
+        private PushDoTag(tagn : string) : void {
+            def tagn = tagn.ToLower();
+            mutable tagval;
+            unless(_Tags.TryGetValue(tagn, out tagval)) return;
+            def result = tagval.TagOpen(TagArgs.ToArray());
+            unless(result == null) {
+                when(tagval.TagClose != null)
+                    StkTag.Push(tagn);
+                ignore Buffer.Append(result);
+            }
+        }
+    
+        private PopTag() : void {
+            when(StkTag.Count < 1) return;
+            def last = _Tags[StkTag.Pop()];
+            def result = last.TagClose();
+            unless(result == null)
+                ignore Buffer.Append(result);
+        }
+    
+        [Record]
+        public struct Tag {
+            public TagOpen : array[string] -> string;
+            public TagClose : void -> string;
+        }
+        
+        public module TagSets {
+            public BasicHtml(mkup : MijMarkup) : void {
+                mkup.Tags["b"] = Tag(fun(_) { "<b>"; }, fun() { "</b>"; });
+                mkup.Tags["i"] = Tag(fun(_) { "<i>"; }, fun() { "</i>"; });
+                mkup.Tags["u"] = Tag(fun(_) { "<u>"; }, fun() { "</u>"; });
+                mkup.Tags["s"] = Tag(fun(_) { "<s>"; }, fun() { "</s>"; });
+                mkup.Tags["c"] = Tag(fun(arg) {
+                    unless(arg.Length > 0) return null;
+                    def col = HttpUtility.HtmlEncode(arg[0]);
+                    $"<font color=\"$col\">";
+                }, fun() { "</font>"; });
+            }
+        }
+    }
+}
+
+/*module Program {
+    public Main() : void {
+        def markup = MijMarkup();
+        MijMarkup.TagSets.BasicHtml(markup);
+        def input = @"test {\b}bold{\} normal";
+        def result = markup.Parse(input);
+        WriteLine(result ?? "FALSE");
+        ignore ReadKey(true);
+    }
+}*/

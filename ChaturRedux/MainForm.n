@@ -1,0 +1,336 @@
+﻿using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+using Nemerle.Imperative;
+using Nemerle.Extensions;
+
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.IO;
+using System.Net;
+using System.Threading;
+using System.Web;
+using System.Media;
+using System.Windows.Forms;
+
+using MijMacro;
+using Mijyuoon;
+using Lidgren.Network;
+using TheArtOfDev.HtmlRenderer.Core;
+using TheArtOfDev.HtmlRenderer.WinForms;
+
+namespace ChaturRedux {
+    public partial class MainForm : Form {
+        private mutable dspHtml : HtmlPanel;
+        private mutable pnlSplit : SplitContainer;
+        private mutable txInput : TextBox;
+        private mutable pnlTabs : TabControl;
+        private mutable tabChat : TabPage;
+        private mutable tabConn : TabPage;
+        private mutable lbUsers : ListBox;
+        private mutable pnlSplitConn : SplitContainer;
+        private mutable gb1 : GroupBox;
+        private mutable gb2 : GroupBox;
+        private mutable txSvPrt : TextBox;
+        private mutable txSvAdr : TextBox;
+        private mutable lb2 : Label;
+        private mutable lb1 : Label;
+        private mutable gb3 : GroupBox;
+        private mutable txNick : TextBox;
+        private mutable label1 : Label;
+        private mutable btConn : Button;
+        private mutable lbStatus : Label;
+        
+        mutable Status : int = -1;
+        mutable NickName : string;
+        mutable SrvAddr : IPEndPoint;
+        
+        private Cli : NetClient;
+        mutable UserID : int;
+        private Users : Dictionary[int, string];
+        private Markup : MijMarkup;
+        private Snd_Recv : SoundPlayer;
+        
+        public this() {
+            InitializeComponent();
+            dspHtml = HtmlPanel() <- {
+                Dock = DockStyle.Fill;
+                AvoidImagesLateLoading = true;
+                Invalidated += fun(_, _) {
+                    def maxscroll = dspHtml.VerticalScroll.Maximum;
+                    fori(0 <= i < 2) dspHtml.VerticalScroll.Value = maxscroll;
+                    dspHtml.PerformLayout();
+                };
+            };
+            pnlSplit.Panel1.Controls.Add(dspHtml);
+            unless(File.Exists("Data/default.css")) {
+                ignore MessageBox.Show("Cannot load default sylesheets!",
+                     "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Application.Exit(); return;
+            }
+            dspHtml.BaseStylesheet = File.ReadAllText("Data/default.css");
+            dspHtml.Text = "<body>" + WrapS("Welcome to Chaturr!", "notify", true);
+            when(File.Exists("Data/message.wav")) {
+                Snd_Recv = SoundPlayer("Data/message.wav");
+            }
+            Cli = NetClient(NetPeerConfiguration("Chaturr") <- {
+                UseMessageRecycling = true;
+                ConnectionTimeout = 5.0f;
+            });
+            Cli.RegisterReceivedCallback(Msg_Callback);
+            Cli.Start();
+            (Users, Markup) = (Dictionary(), MijMarkup());
+            MijMarkup.TagSets.BasicHtml(Markup);
+            SetConnStatus(0);
+        }
+        
+        private WrapS(data : string, cln : string, nl = false) : string {
+            def nls = if(nl) "<br/>" else "";
+            $"<span class=\"$cln\">$data$nls</span>";
+        }
+        
+        private HtmlEncNL(data : string, nl = true) : string {
+            def escape = HttpUtility.HtmlEncode(data);
+            if(nl) escape.Replace("\n", "<br/>") else escape;
+        }
+        
+        public AddNotify(msg : string) : void {
+            dspHtml.Text += WrapS(msg, "notify", true);
+        }
+        
+        private AppendToChat(msg : string, unick : string, self = false, noesc = false) : void {
+            def nick = HtmlEncNL(unick ?? NickName);
+            if(!self) {
+                def orig = if(noesc) msg else HtmlEncNL(msg);
+                def emsg = ": " + (Markup.Parse(orig) ?? orig);
+                def ctag = if(unick == null) "self" else "other";
+                dspHtml.Text += WrapS(nick, ctag) + WrapS(emsg, "msg", true);
+            } else {
+                def ctag = if(unick == null) "self" else "other";
+                def message = if(noesc) msg else HtmlEncNL(msg);
+                dspHtml.Text += WrapS($"$nick $message", ctag, true);
+            }
+            when(unick != null) {
+                Snd_Recv?.Play();
+                FlashWindow.Ex(this);
+            }
+        }
+        
+        private HandleChatCmd(msg : string, nick : string) : bool {
+            if(msg[0] != '/')
+                AppendToChat(msg, nick);
+            else regexp match(msg) {
+                | "^/me (?<text>.+)$" =>
+                    AppendToChat(text, nick, true);
+                | "^/img (?<data>.+)$" =>
+                    def _sep = array[' ', '\n', '\r'];
+                    def links = data.Split(_sep, StringSplitOptions.RemoveEmptyEntries);
+                    mutable buffer = "posted images:<br/>";
+                    foreach(lnk in links) {
+                        def lnk = HtmlEncNL(lnk, false);
+                        buffer += ($"<a href=\"$lnk\"><img class=\"thumb\" src=\"$lnk\"/></a>");
+                    }
+                    AppendToChat(buffer, nick, true, true);
+                | "^/(cls|clear)$" =>
+                    dspHtml.Text = "";
+                    return false;
+                | "^/quit$" =>
+                    Disconnect();
+                    return false;
+                | _ => AppendToChat(msg, nick);
+            }
+            false;
+        }
+        
+        public SendChatMessage(msg : string) : void {
+            def msg = msg.Replace("\r", "");
+            when(HandleChatCmd(msg, null)) return;
+            def msg = Cli.CreateMessage() <- {
+                Write(10b); Write(UserID); Write(msg);
+            };
+            ignore Cli.SendMessage(msg, NetDeliveryMethod.ReliableOrdered);
+        }
+        
+        private SetConnStatus(status :  int) : void {
+            when(Status == status) return;
+            match(status) {
+                | 0 =>
+                    lbUsers.Items.Clear();
+                    btConn.Enabled = true;
+                    txNick.Enabled = true;
+                    txSvAdr.Enabled = true;
+                    txSvPrt.Enabled = true;
+                    btConn.Text = "Connect to server";
+                    lbStatus.ForeColor = Color.Red;
+                    lbStatus.Text = "Not connected to any server";
+                    when(Status > -1)
+                        AddNotify("Disconnected from server");
+                | 1 =>
+                    btConn.Enabled = false;
+                    txNick.Enabled = false;
+                    txSvAdr.Enabled = false;
+                    txSvPrt.Enabled = false;
+                    lbStatus.ForeColor = Color.Orange;
+                    lbStatus.Text = "Establishing connection...";
+                | 3 =>
+                    lbUsers.Items.Clear();
+                    btConn.Enabled = true;
+                    btConn.Text = "Disconnect";
+                    lbStatus.ForeColor = Color.Green;
+                    def (adr, prt) = (SrvAddr.Address, SrvAddr.Port);
+                    lbStatus.Text = $"Connected to $adr:$prt";
+                    AddNotify($"Connected to server $adr:$prt");
+                | _ => die "U wot m8. @1";
+            }
+            Status = status;
+            txInput.Enabled = (status == 3);
+            lbStatus.Text = $"STATUS: $(lbStatus.Text)";
+        }
+        
+        private Msg_Callback(peer : object) : void {
+            def peer = peer :> NetPeer;
+            def msg = peer.ReadMessage();
+            match(msg.MessageType) {
+                | ErrorMessage =>
+                    AddNotify("ERR: " + msg.ReadString());
+                | WarningMessage | DebugMessage
+                | VerboseDebugMessage => ();
+                    //AddNotify("SYS: " + msg.ReadString());
+                | StatusChanged =>
+                    def status = msg.ReadByte() :> NetConnectionStatus;
+                    match(status) {
+                        | Connected =>
+                            SetConnStatus(3);
+                            pnlTabs.SelectedIndex = 1;
+                        | Disconnected =>
+                            SetConnStatus(0);
+                            pnlTabs.SelectedIndex = 0;
+                        | _ => ();
+                    }
+                | Data => HandleChatData(msg);
+                | ty => die $"U wot m8. @2:$ty";
+            }
+            Cli.Recycle(msg);
+        }
+        
+        public InitConnection(host : IPEndPoint) : void {
+            when(Status != 0) return;
+            SrvAddr = host;
+            def hail = Cli.CreateMessage() <- {
+                Write(8b); Write(NickName);
+            };
+            ignore Cli.Connect(host, hail);
+            SetConnStatus(1);
+        }
+        
+        public Disconnect() : void {
+            when(Status != 3) return;
+            Cli.Disconnect("!!");
+            SetConnStatus(0);
+        }
+        
+        private HandleChatData(msg : NetIncomingMessage) : void {
+            def msgid = msg.ReadByte();
+            match(msgid) {
+                | 5 =>
+                    Users.Clear();
+                    UserID = msg.ReadInt32();
+                    def count = msg.ReadInt32();
+                    fori(0 <= i < count) {
+                        def uid = msg.ReadInt32();
+                        def nick = msg.ReadString();
+                        Users.Add(uid, nick);
+                        ignore lbUsers.Items.Add(nick);
+                    }
+                | 6 =>
+                    def uid = msg.ReadInt32();
+                    def nick = msg.ReadString();
+                    Users.Add(uid, nick);
+                    ignore lbUsers.Items.Add(nick);
+                    AddNotify($"User \"$nick\" has entered chat");
+                | 7 =>
+                    def uid = msg.ReadInt32();
+                    def nick = Users[uid];
+                    lbUsers.Items.Remove(nick);
+                    ignore Users.Remove(uid);
+                    AddNotify($"User \"$nick\" has left chat");
+                | 10 =>
+                    def uid = msg.ReadInt32();
+                    def text = msg.ReadString();
+                    when(Users.ContainsKey(uid))
+                        ignore HandleChatCmd(text, Users[uid]);
+                | _ => die "U wot m8. @3";
+            }
+        }
+        
+        private txInput_KeyDown (_ : object,  e : KeyEventArgs) : void {
+            e.SuppressKeyPress = true;
+            match(e.KeyCode) {
+                | Keys.A when(e.Modifiers == Keys.Alt) =>
+                    txInput.SelectAll();
+                | Keys.Enter when(e.Modifiers == Keys.None) =>
+                    def _rem = array[' ', '\n', '\r'];
+                    def message = txInput.Text.Trim(_rem);
+                    when(message.Length > 0)
+                        SendChatMessage(message);
+                    txInput.Text = "";
+                | _ => e.SuppressKeyPress = false;
+            }
+        }
+    
+        private btConn_Click (_ : object,  _ : EventArgs) : void {
+            match(Status) {
+                | 0 =>
+                    when(txNick.Text == "") {
+                        ignore MessageBox.Show("Nickname must not be empty!",
+                            "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+            
+                    mutable address, port;
+                    unless(IPAddress.TryParse(txSvAdr.Text, out address)
+                    && UInt16.TryParse(txSvPrt.Text, out port)) {
+                        ignore MessageBox.Show("Invalid server address/port!",
+                            "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+            
+                    NickName = txNick.Text;
+                    InitConnection(IPEndPoint(address, port));
+                | 3 => Disconnect();
+                | _ => die "U wot m8! @4";
+            }
+        }
+    
+        private MainForm_FormClosed (_ : object,  _ : FormClosedEventArgs) : void {
+            Disconnect();
+        }
+    }
+    
+    using System.Runtime.InteropServices;
+    module FlashWindow {
+        [DllImport("user32.dll")]
+        extern FlashWindowEx(pwfi : ref FLASHWINFO) : bool;
+        
+        [Record]
+        [StructLayout(LayoutKind.Sequential)]
+        struct FLASHWINFO {
+            public cbSize : uint;
+            public hwnd : IntPtr;
+            public dwFlags : uint;
+            public uCount : uint;
+            public dwTimeout : uint;
+        }
+        
+        public Ex(form : Form) : void {
+            def cbSize = Marshal.SizeOf(typeof(FLASHWINFO));
+            mutable fInfo = FLASHWINFO(cbSize :> uint, form.Handle, 15, UInt32.MaxValue, 0);
+            ignore FlashWindowEx(ref fInfo);
+        }
+    }
+}

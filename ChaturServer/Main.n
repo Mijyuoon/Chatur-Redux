@@ -1,0 +1,147 @@
+﻿using Nemerle.Collections;
+using Nemerle.Text;
+using Nemerle.Utility;
+using Nemerle.Extensions;
+
+using System;
+using System.Collections.Generic;
+using System.Console;
+using System.Linq;
+using System.Threading;
+
+using MijMacro;
+using Lidgren.Network;
+
+namespace ChaturRedux {
+    public class ChaturServer {
+        private Srv : NetServer;
+        mutable Thrd : Thread;
+        mutable MsgFn : string -> void;
+    
+        mutable LastUID : int;
+        private Users : Dictionary[int, string];
+    
+        public MessageFunc : string -> void {
+            get { MsgFn; }
+            set { when(value != null) MsgFn = value; }
+        }
+    
+        public IsRunning : bool {
+            get; private set;
+        }
+    
+        public this(port : int) {
+            this.Srv = NetServer(NetPeerConfiguration("Chaturr") <- {
+                Port = port; UseMessageRecycling = true;
+                EnableMessageType(NetIncomingMessageType.ConnectionApproval);
+            });
+            this.MsgFn = fun(_) {};
+            this.Users = Dictionary();
+        }
+    
+        public StartWait(wait = true) : void {
+            IsRunning = true;
+            Thrd = thread(Start) {
+                while(IsRunning) {
+                    mutable msg;
+                    ignore Srv.MessageReceivedEvent.WaitOne();
+                    while({msg = Srv.ReadMessage(); msg} != null) {
+                        match(msg.MessageType) {
+                            | ErrorMessage =>
+                                MsgFn("ERR: " + msg.ReadString());
+                            | WarningMessage | DebugMessage
+                            | VerboseDebugMessage =>
+                                MsgFn("SYS: " + msg.ReadString());
+                            | Data => HandleChatData(msg);
+                            | StatusChanged =>
+                                def status = msg.ReadByte() :> NetConnectionStatus;
+                                match(status) {
+                                    | Connected =>
+                                        def sender = msg.SenderConnection;
+                                        def uid = sender.Tag :> int;
+                                        def nick = Users[uid];
+                                    
+                                        def omsg = Srv.CreateMessage() <- {
+                                            Write(5b); Write(uid); Write(Users.Count);
+                                        };
+                                        foreach(ud in Users) {
+                                            omsg.Write(ud.Key);
+                                            omsg.Write(ud.Value);
+                                        }
+                                        ignore Srv.SendMessage(omsg, sender, NetDeliveryMethod.ReliableOrdered);
+                                    
+                                        def omsg = Srv.CreateMessage() <- {
+                                            Write(6b); Write(uid); Write(nick);
+                                        };
+                                        Srv.SendToAll(omsg, sender, NetDeliveryMethod.ReliableOrdered, 0);
+                                    | Disconnected =>
+                                        def sender = msg.SenderConnection;
+                                        def uid = sender.Tag :> int;
+                                        def nick = Users[uid];
+                                        MsgFn($"User \"$nick\" left");
+                                        ignore Users.Remove(uid);
+                                    
+                                        def omsg = Srv.CreateMessage() <- {
+                                            Write(7b); Write(uid);
+                                        };
+                                        Srv.SendToAll(omsg, sender, NetDeliveryMethod.ReliableOrdered, 0);
+                                    | _ => ();
+                                }
+                            | ConnectionApproval => HandleAuth(msg);
+                            | _ => ();
+                        }
+                        Srv.Recycle(msg);
+                    }
+                }
+            }
+            Srv.Start();
+            MsgFn("Starting server...");
+            while(wait && IsRunning) { }
+        }
+    
+        public Shutdown() : void {
+            IsRunning = false;
+            MsgFn("Shutting down...");
+        }
+    
+        private HandleChatData(msg : NetIncomingMessage) : void {
+            def msgid = msg.ReadByte();
+            match(msgid) {
+                | 10 =>
+                    def uid = msg.ReadInt32();
+                    def text = msg.ReadString();
+                    def omsg = Srv.CreateMessage() <- {
+                        Write(10b); Write(uid); Write(text);
+                    };
+                    def orig = msg.SenderConnection;
+                    Srv.SendToAll(omsg, orig, NetDeliveryMethod.ReliableOrdered, 0);
+                | id => MsgFn($"Bad message type: $$$id");
+            }
+        }
+    
+        private HandleAuth(msg : NetIncomingMessage) : void {
+            MsgFn("Received auth request");
+            def msgid = msg.ReadByte();
+            if(msgid != 8) {
+                msg.SenderConnection.Deny();
+                MsgFn("Invalid connection - denied");
+            } else {
+                def nick = msg.ReadString();
+                MsgFn($"User \"$nick\" connected");
+                Users[{LastUID++; LastUID}] = nick;
+                msg.SenderConnection.Tag = LastUID;
+                msg.SenderConnection.Approve();
+            }
+            Srv.FlushSendQueue();
+        }
+    }
+}
+
+using ChaturRedux;
+module Program {
+    public Main() : void {
+        def srv = ChaturServer(42480);
+        srv.MessageFunc = WriteLine(_);
+        srv.StartWait();
+    }
+}
