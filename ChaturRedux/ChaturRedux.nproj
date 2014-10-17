@@ -62,17 +62,17 @@
     <Reference Include="HtmlRenderer, Version=1.5.0.5, Culture=neutral, PublicKeyToken=null">
       <Name>HtmlRenderer</Name>
       <AssemblyName>HtmlRenderer.dll</AssemblyName>
-      <HintPath>HtmlRenderer.dll</HintPath>
+      <HintPath>..\ExtLibs\HtmlRenderer.dll</HintPath>
     </Reference>
     <Reference Include="HtmlRenderer.WinForms, Version=1.5.0.5, Culture=neutral, PublicKeyToken=null">
       <Name>HtmlRenderer.WinForms</Name>
       <AssemblyName>HtmlRenderer.WinForms.dll</AssemblyName>
-      <HintPath>HtmlRenderer.WinForms.dll</HintPath>
+      <HintPath>..\ExtLibs\HtmlRenderer.WinForms.dll</HintPath>
     </Reference>
     <Reference Include="Lidgren.Network, Version=2012.1.7.0, Culture=neutral, PublicKeyToken=null">
       <Name>Lidgren.Network</Name>
       <AssemblyName>Lidgren.Network.dll</AssemblyName>
-      <HintPath>Lidgren.Network.dll</HintPath>
+      <HintPath>..\ExtLibs\Lidgren.Network.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="System" />
@@ -100,7 +100,7 @@
     <MacroReference Include="MijMacros, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
       <Name>MijMacros</Name>
       <AssemblyName>MijMacros.dll</AssemblyName>
-      <HintPath>..\..\NmApp1\MijMacros\bin\Release\MijMacros.dll</HintPath>
+      <HintPath>..\ExtLibs\MijMacros.dll</HintPath>
       <Private>False</Private>
     </MacroReference>
     <MacroReference Include="Nemerle.Linq">

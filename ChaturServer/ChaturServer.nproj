@@ -47,7 +47,7 @@
     <Platform>x86</Platform>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <DebugSymbols>true</DebugSymbols>
+    <DebugSymbols>false</DebugSymbols>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
@@ -62,7 +62,7 @@
     <Reference Include="Lidgren.Network, Version=2012.1.7.0, Culture=neutral, PublicKeyToken=null">
       <Name>Lidgren.Network</Name>
       <AssemblyName>Lidgren.Network.dll</AssemblyName>
-      <HintPath>Lidgren.Network.dll</HintPath>
+      <HintPath>..\ExtLibs\Lidgren.Network.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="System" />
@@ -85,7 +85,7 @@
     <MacroReference Include="MijMacros, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
       <Name>MijMacros</Name>
       <AssemblyName>MijMacros.dll</AssemblyName>
-      <HintPath>..\..\NmApp1\MijMacros\bin\Release\MijMacros.dll</HintPath>
+      <HintPath>..\ExtLibs\MijMacros.dll</HintPath>
       <Private>False</Private>
     </MacroReference>
     <MacroReference Include="Nemerle.Linq">

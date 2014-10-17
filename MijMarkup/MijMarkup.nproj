@@ -37,7 +37,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ProjectDir>$(SolutionDir)$(Name)\</ProjectDir>
-    <!--<PreBuildEvent>cd /d "$(ProjectDir)" %26%26 java -jar "antlr4.jar" -Dlanguage=Nemerle_v12 "$(Name).g4"</PreBuildEvent>-->
     <RunDebugger>false</RunDebugger>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
@@ -51,7 +50,7 @@
     <Platform>x86</Platform>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
-    <DebugSymbols>true</DebugSymbols>
+    <DebugSymbols>false</DebugSymbols>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
@@ -89,7 +88,7 @@
     <MacroReference Include="MijMacros, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
       <Name>MijMacros</Name>
       <AssemblyName>MijMacros.dll</AssemblyName>
-      <HintPath>..\..\NmApp1\MijMacros\bin\Release\MijMacros.dll</HintPath>
+      <HintPath>..\ExtLibs\MijMacros.dll</HintPath>
       <Private>False</Private>
     </MacroReference>
     <MacroReference Include="Nemerle.Linq">
