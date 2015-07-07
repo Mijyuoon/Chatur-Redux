@@ -20,6 +20,11 @@ body {
 	font-weight: bold;
 }
 
+.icon {
+	font-style: italic;
+	color: #CCA400;
+}
+
 .thumb {
 	max-width: 120px;
 	max-height: 120px;

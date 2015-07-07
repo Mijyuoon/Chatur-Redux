@@ -79,9 +79,7 @@ namespace Mijyuoon {
                         || src[_pos] == '#') {
                             npos++; _pos++;
                         }
-                        when(npos < 1) return null;
                         TagArgs.Add(src.Substring(_pos - npos, npos));
-                        WriteLine($"d=$(src[_pos])");
                         match(src[_pos]) {
                             | ';' => ();
                             | '}' =>
@@ -138,14 +136,3 @@ namespace Mijyuoon {
         }
     }
 }
-
-/*module Program {
-    public Main() : void {
-        def markup = MijMarkup();
-        MijMarkup.TagSets.BasicHtml(markup);
-        def input = @"test {\b}bold{\} normal";
-        def result = markup.Parse(input);
-        WriteLine(result ?? "FALSE");
-        ignore ReadKey(true);
-    }
-}*/

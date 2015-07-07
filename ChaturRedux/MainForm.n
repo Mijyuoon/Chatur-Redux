@@ -17,6 +17,7 @@ using System.Threading;
 using System.Web;
 using System.Media;
 using System.Windows.Forms;
+using System.Runtime.InteropServices;
 
 using MijMacro;
 using Mijyuoon;
@@ -25,6 +26,27 @@ using TheArtOfDev.HtmlRenderer.Core;
 using TheArtOfDev.HtmlRenderer.WinForms;
 
 namespace ChaturRedux {
+    module FlashWindow {
+        [DllImport("user32.dll")]
+        extern FlashWindowEx(pwfi : ref FLASHWINFO) : bool;
+        
+        [Record]
+        [StructLayout(LayoutKind.Sequential)]
+        struct FLASHWINFO {
+            public cbSize : uint;
+            public hwnd : IntPtr;
+            public dwFlags : uint;
+            public uCount : uint;
+            public dwTimeout : uint;
+        }
+        
+        public Ex(form : Form) : void {
+            def cbSize = Marshal.SizeOf(typeof(FLASHWINFO));
+            mutable fInfo = FLASHWINFO(cbSize :> uint, form.Handle, 15, UInt32.MaxValue, 0);
+            ignore FlashWindowEx(ref fInfo);
+        }
+    }
+    
     public partial class MainForm : Form {
         private mutable dspHtml : HtmlPanel;
         private mutable pnlSplit : SplitContainer;
@@ -86,6 +108,14 @@ namespace ChaturRedux {
             Cli.Start();
             (Users, Markup) = (Dictionary(), MijMarkup());
             MijMarkup.TagSets.BasicHtml(Markup);
+            Markup.Tags["g"] = MijMarkup.Tag(fun(arg) {
+                when(arg.Length < 1) return null;
+                def txt = if(arg.Length > 1) arg[1] else null;
+                def icon = $"Data/Icons/$(arg[0]).png";
+                when(txt == null && File.Exists(icon))
+                    return $"<img src=\"$icon\"/>";
+                $"<span class=\"icon\">*$(arg[0])*</span>";
+            }, null);
             SetConnStatus(0);
         }
         
@@ -108,11 +138,13 @@ namespace ChaturRedux {
             if(!self) {
                 def orig = if(noesc) msg else HtmlEncNL(msg);
                 def emsg = ": " + (Markup.Parse(orig) ?? orig);
+                unless(emsg.Length > 2) return;
                 def ctag = if(unick == null) "self" else "other";
                 dspHtml.Text += WrapS(nick, ctag) + WrapS(emsg, "msg", true);
             } else {
                 def ctag = if(unick == null) "self" else "other";
                 def message = if(noesc) msg else HtmlEncNL(msg);
+                unless(message.Length > 0) return;
                 dspHtml.Text += WrapS($"$nick $message", ctag, true);
             }
             when(unick != null) {
@@ -309,28 +341,6 @@ namespace ChaturRedux {
     
         private MainForm_FormClosed (_ : object,  _ : FormClosedEventArgs) : void {
             Disconnect();
-        }
-    }
-    
-    using System.Runtime.InteropServices;
-    module FlashWindow {
-        [DllImport("user32.dll")]
-        extern FlashWindowEx(pwfi : ref FLASHWINFO) : bool;
-        
-        [Record]
-        [StructLayout(LayoutKind.Sequential)]
-        struct FLASHWINFO {
-            public cbSize : uint;
-            public hwnd : IntPtr;
-            public dwFlags : uint;
-            public uCount : uint;
-            public dwTimeout : uint;
-        }
-        
-        public Ex(form : Form) : void {
-            def cbSize = Marshal.SizeOf(typeof(FLASHWINFO));
-            mutable fInfo = FLASHWINFO(cbSize :> uint, form.Handle, 15, UInt32.MaxValue, 0);
-            ignore FlashWindowEx(ref fInfo);
         }
     }
 }

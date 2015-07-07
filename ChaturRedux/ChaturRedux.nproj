@@ -119,6 +119,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Data" />
+    <Folder Include="Data\Icons" />
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
@@ -127,14 +128,43 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MijMarkup\MijMarkup.nproj">
-      <Name>MijMarkup</Name>
-      <Project>{207c9294-79d9-4f85-beda-8811e3b9e859}</Project>
-      <Private>True</Private>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Data\default.css">
+      <SubType>Content</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Icons\award.png">
+      <SubType>Content</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Icons\bomb.png">
+      <SubType>Content</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Icons\box.png">
+      <SubType>Content</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Icons\clock.png">
+      <SubType>Content</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Icons\cross.png">
+      <SubType>Content</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Icons\funny.png">
+      <SubType>Content</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Icons\heart.png">
+      <SubType>Content</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Icons\tick.png">
+      <SubType>Content</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Icons\zing.png">
       <SubType>Content</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -142,6 +172,13 @@
       <SubType>Content</SubType>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MijMarkup\MijMarkup.nproj">
+      <Name>MijMarkup</Name>
+      <Project>{207c9294-79d9-4f85-beda-8811e3b9e859}</Project>
+      <Private>True</Private>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(Nemerle)\Nemerle.MSBuild.targets" />
   <!--
